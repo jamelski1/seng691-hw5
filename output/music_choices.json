@@ -1,0 +1,130 @@
+{
+  "0": {
+    "chosen_track": "dramatic",
+    "target_profile": {
+      "tempo_norm": 0.421,
+      "major": 0.264,
+      "timbre": 0.0,
+      "register_norm": 0.038,
+      "warmth": 0.484
+    },
+    "scores": {
+      "calm": 0.9714,
+      "bright": 2.1763,
+      "warm": 1.2923,
+      "dramatic": 0.2798
+    }
+  },
+  "1": {
+    "chosen_track": "calm",
+    "target_profile": {
+      "tempo_norm": 0.128,
+      "major": 0.633,
+      "timbre": 0.048,
+      "register_norm": 0.975,
+      "warmth": 0.088
+    },
+    "scores": {
+      "calm": 0.6391,
+      "bright": 1.4059,
+      "warm": 1.5159,
+      "dramatic": 1.3761
+    }
+  },
+  "2": {
+    "chosen_track": "dramatic",
+    "target_profile": {
+      "tempo_norm": 0.255,
+      "major": 0.518,
+      "timbre": 0.278,
+      "register_norm": 0.436,
+      "warmth": 0.0
+    },
+    "scores": {
+      "calm": 0.6525,
+      "bright": 1.3713,
+      "warm": 1.3963,
+      "dramatic": 0.523
+    }
+  },
+  "3": {
+    "chosen_track": "dramatic",
+    "target_profile": {
+      "tempo_norm": 1.0,
+      "major": 0.457,
+      "timbre": 0.552,
+      "register_norm": 0.0,
+      "warmth": 0.555
+    },
+    "scores": {
+      "calm": 1.59,
+      "bright": 1.3049,
+      "warm": 1.1244,
+      "dramatic": 1.0675
+    }
+  },
+  "4": {
+    "chosen_track": "calm",
+    "target_profile": {
+      "tempo_norm": 0.364,
+      "major": 0.56,
+      "timbre": 0.389,
+      "register_norm": 0.438,
+      "warmth": 0.181
+    },
+    "scores": {
+      "calm": 0.4787,
+      "bright": 0.9684,
+      "warm": 0.9367,
+      "dramatic": 0.535
+    }
+  },
+  "5": {
+    "chosen_track": "warm",
+    "target_profile": {
+      "tempo_norm": 0.0,
+      "major": 0.978,
+      "timbre": 0.94,
+      "register_norm": 1.0,
+      "warmth": 1.0
+    },
+    "scores": {
+      "calm": 0.7831,
+      "bright": 1.2631,
+      "warm": 0.6861,
+      "dramatic": 3.0042
+    }
+  },
+  "6": {
+    "chosen_track": "warm",
+    "target_profile": {
+      "tempo_norm": 0.734,
+      "major": 0.639,
+      "timbre": 1.0,
+      "register_norm": 0.037,
+      "warmth": 0.57
+    },
+    "scores": {
+      "calm": 1.2228,
+      "bright": 0.9514,
+      "warm": 0.7999,
+      "dramatic": 1.2126
+    }
+  },
+  "7": {
+    "chosen_track": "calm",
+    "target_profile": {
+      "tempo_norm": 0.562,
+      "major": 0.565,
+      "timbre": 0.108,
+      "register_norm": 0.731,
+      "warmth": 0.368
+    },
+    "scores": {
+      "calm": 0.5541,
+      "bright": 0.8065,
+      "warm": 0.8008,
+      "dramatic": 0.9716
+    }
+  }
+}

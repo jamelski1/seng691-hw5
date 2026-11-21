@@ -1,0 +1,194 @@
+{
+  "n_images": 240,
+  "chosen_k": 8,
+  "silhouette_by_k": {
+    "4": 0.1057,
+    "5": 0.1204,
+    "6": 0.1367,
+    "7": 0.1441,
+    "8": 0.1496,
+    "9": 0.1433,
+    "10": 0.1413
+  },
+  "silhouette_kmeans": 0.1496,
+  "silhouette_agglomerative_same_k": 0.1467,
+  "purity_vs_seed_topics": 0.8208,
+  "nmi_vs_seed_topics": 0.7392,
+  "clusters": [
+    {
+      "cluster": 0,
+      "size": 31,
+      "dominant_seed_topic": "dogs",
+      "dominant_share": 0.968,
+      "topic_mix": {
+        "dogs": 30,
+        "snow": 1
+      },
+      "mean_brightness": 0.4806,
+      "mean_saturation": 0.1974,
+      "mean_warmth": 0.0637,
+      "mean_edge_density": 0.0713,
+      "exemplars": [
+        "dogs/dogs_29.jpg",
+        "dogs/dogs_27.jpg",
+        "dogs/dogs_05.jpg",
+        "dogs/dogs_01.jpg",
+        "dogs/dogs_17.jpg"
+      ]
+    },
+    {
+      "cluster": 1,
+      "size": 19,
+      "dominant_seed_topic": "beach",
+      "dominant_share": 1.0,
+      "topic_mix": {
+        "beach": 19
+      },
+      "mean_brightness": 0.6863,
+      "mean_saturation": 0.2102,
+      "mean_warmth": -0.0654,
+      "mean_edge_density": 0.0553,
+      "exemplars": [
+        "beach/beach_04.jpg",
+        "beach/beach_15.jpg",
+        "beach/beach_13.jpg",
+        "beach/beach_08.jpg",
+        "beach/beach_03.jpg"
+      ]
+    },
+    {
+      "cluster": 2,
+      "size": 27,
+      "dominant_seed_topic": "city",
+      "dominant_share": 0.963,
+      "topic_mix": {
+        "city": 26,
+        "beach": 1
+      },
+      "mean_brightness": 0.568,
+      "mean_saturation": 0.2722,
+      "mean_warmth": -0.0941,
+      "mean_edge_density": 0.0622,
+      "exemplars": [
+        "city/city_20.jpg",
+        "city/city_25.jpg",
+        "city/city_18.jpg",
+        "city/city_21.jpg",
+        "city/city_17.jpg"
+      ]
+    },
+    {
+      "cluster": 3,
+      "size": 42,
+      "dominant_seed_topic": "forest",
+      "dominant_share": 0.667,
+      "topic_mix": {
+        "forest": 28,
+        "beach": 6,
+        "flowers": 5,
+        "mountains": 2,
+        "snow": 1
+      },
+      "mean_brightness": 0.4723,
+      "mean_saturation": 0.3457,
+      "mean_warmth": 0.0867,
+      "mean_edge_density": 0.1029,
+      "exemplars": [
+        "forest/forest_08.jpg",
+        "forest/forest_27.jpg",
+        "forest/forest_22.jpg",
+        "forest/forest_20.jpg",
+        "forest/forest_30.jpg"
+      ]
+    },
+    {
+      "cluster": 4,
+      "size": 38,
+      "dominant_seed_topic": "mountains",
+      "dominant_share": 0.711,
+      "topic_mix": {
+        "mountains": 27,
+        "snow": 9,
+        "beach": 2
+      },
+      "mean_brightness": 0.5684,
+      "mean_saturation": 0.302,
+      "mean_warmth": -0.0352,
+      "mean_edge_density": 0.0682,
+      "exemplars": [
+        "snow/snow_12.jpg",
+        "mountains/mountains_27.jpg",
+        "snow/snow_26.jpg",
+        "snow/snow_08.jpg",
+        "mountains/mountains_01.jpg"
+      ]
+    },
+    {
+      "cluster": 5,
+      "size": 30,
+      "dominant_seed_topic": "desert",
+      "dominant_share": 0.9,
+      "topic_mix": {
+        "desert": 27,
+        "beach": 2,
+        "mountains": 1
+      },
+      "mean_brightness": 0.6918,
+      "mean_saturation": 0.4501,
+      "mean_warmth": 0.2317,
+      "mean_edge_density": 0.0483,
+      "exemplars": [
+        "desert/desert_17.jpg",
+        "desert/desert_13.jpg",
+        "desert/desert_06.jpg",
+        "desert/desert_12.jpg",
+        "desert/desert_08.jpg"
+      ]
+    },
+    {
+      "cluster": 6,
+      "size": 22,
+      "dominant_seed_topic": "flowers",
+      "dominant_share": 0.955,
+      "topic_mix": {
+        "flowers": 21,
+        "desert": 1
+      },
+      "mean_brightness": 0.4804,
+      "mean_saturation": 0.4661,
+      "mean_warmth": 0.0915,
+      "mean_edge_density": 0.0884,
+      "exemplars": [
+        "flowers/flowers_08.jpg",
+        "flowers/flowers_28.jpg",
+        "flowers/flowers_29.jpg",
+        "flowers/flowers_13.jpg",
+        "flowers/flowers_07.jpg"
+      ]
+    },
+    {
+      "cluster": 7,
+      "size": 31,
+      "dominant_seed_topic": "snow",
+      "dominant_share": 0.613,
+      "topic_mix": {
+        "snow": 19,
+        "city": 4,
+        "flowers": 4,
+        "forest": 2,
+        "desert": 2
+      },
+      "mean_brightness": 0.6328,
+      "mean_saturation": 0.2263,
+      "mean_warmth": 0.0259,
+      "mean_edge_density": 0.079,
+      "exemplars": [
+        "forest/forest_02.jpg",
+        "snow/snow_24.jpg",
+        "snow/snow_25.jpg",
+        "city/city_01.jpg",
+        "snow/snow_05.jpg"
+      ]
+    }
+  ]
+}
