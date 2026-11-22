@@ -11,7 +11,10 @@ narrated screen recording, recorded by Jamel on his own machine.
    https://colab.research.google.com/github/jamelski1/seng691-hw5/blob/main/seng691-hw5.ipynb
 2. The live site home page: https://photo-albums-y7ir.onrender.com
 3. A finished results page as backup, in case a live run is slow on
-   camera: https://photo-albums-y7ir.onrender.com/results/aa959f922318
+   camera. Run a job shortly before recording and keep its results
+   page open: job results are stored on the server's disk and are
+   wiped whenever the service redeploys, so an older results link
+   will not work.
 4. One generated slideshow file ready to play from the notebook run
    (output/slideshows in the repo outputs, or the Drive copy).
 5. Notifications off, microphone checked, browser zoom at 100%.
