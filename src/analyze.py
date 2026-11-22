@@ -23,7 +23,7 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 BASE = Path(__file__).resolve().parent.parent
 IMG_DIR = BASE / "data" / "images"
@@ -37,7 +37,7 @@ def load_manifest():
 
 
 def visual_stats(path):
-    img = Image.open(path).convert("RGB")
+    img = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
     small = img.resize((128, 128))
     arr = np.asarray(small).astype(np.float32) / 255.0
     r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
@@ -81,7 +81,7 @@ def extract_embeddings(paths):
         for i in range(0, len(paths), BATCH):
             batch = []
             for p in paths[i : i + BATCH]:
-                img = Image.open(p).convert("RGB")
+                img = ImageOps.exif_transpose(Image.open(p)).convert("RGB")
                 batch.append(preprocess(img))
             x = torch.stack(batch)
             emb = model(x).numpy()
@@ -202,7 +202,7 @@ def main():
         # Contact-sheet montage of the 12 most central images.
         thumbs = []
         for i in order[:12]:
-            t = Image.open(paths[i]).convert("RGB")
+            t = ImageOps.exif_transpose(Image.open(paths[i])).convert("RGB")
             t.thumbnail((320, 320))
             thumbs.append(t)
         W = 320 * 4

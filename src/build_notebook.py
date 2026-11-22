@@ -36,7 +36,7 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 BASE = Path.cwd()
 DATA = BASE / "data"
@@ -62,7 +62,7 @@ md("""### Initial dataset analysis
 Before any learning, each image is described by four simple statistics that the music rule will also use later: brightness, saturation, warm/cool balance, and edge density (how much fine detail the image has).""")
 
 code("""def visual_stats(path):
-    img = Image.open(path).convert("RGB").resize((128, 128))
+    img = ImageOps.exif_transpose(Image.open(path)).convert("RGB").resize((128, 128))
     arr = np.asarray(img).astype(np.float32) / 255.0
     r, b = arr[..., 0], arr[..., 2]
     mx, mn = arr.max(axis=2), arr.min(axis=2)
@@ -123,7 +123,7 @@ else:
     feats = []
     with torch.no_grad():
         for i in range(0, len(files), 16):
-            batch = [preprocess(Image.open(DATA / "images" / f).convert("RGB"))
+            batch = [preprocess(ImageOps.exif_transpose(Image.open(DATA / "images" / f)).convert("RGB"))
                      for f in files[i:i + 16]]
             feats.append(model(torch.stack(batch)).numpy())
     X = np.vstack(feats)
