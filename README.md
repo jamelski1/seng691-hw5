@@ -14,6 +14,10 @@ music is selected algorithmically from each collection's visual content.
 - Live web service (the same pipeline as a web app):
   https://photo-albums-y7ir.onrender.com
 - Web service source: https://github.com/jamelski1/photo-albums-app
+- Dataset (public): the manifest of all 240 photographs, with
+  creators, licenses, and Wikimedia Commons source pages (also in
+  this repository as `data/manifest.csv`):
+  https://github.com/jamelski1/photo-albums-app/blob/main/data/example_manifest.csv
 
 ## Pipeline
 
