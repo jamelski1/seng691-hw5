@@ -475,6 +475,8 @@ md("""## 5. Slideshow video
 
 The builder takes a cluster's most central images, renders each at 1280 by 720 over a blurred fill of itself (nothing cropped, no black bars), fades between them, and lays the chosen track underneath. Below, Cluster 3 is built and shown; `src/build_videos.py` builds the three largest clusters the same way. The audio laid underneath is `music_files[CID]`: the downloaded Jamendo MP3 when one was picked for that cluster, otherwise the synthesized WAV the rule chose.""")
 
+md("""**A note on slideshow timing.** In the hosted web service, slideshow timing is synchronized to the music: each collection's track is analyzed for its beat, every photo is shown for a whole number of beats, and the fades between photos land on the beat. The slideshows in this notebook keep the fixed 2.6-second timing, because the outputs stored in this notebook are the submitted run, left exactly as they were generated.""")
+
 code("""import subprocess, tempfile
 
 def run(cmd): subprocess.run(cmd, check=True, capture_output=True, text=True)
