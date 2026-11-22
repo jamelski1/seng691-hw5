@@ -5,6 +5,16 @@ pre-trained convolutional neural network, groups similar images into
 collections, and generates slideshow-style video albums whose background
 music is selected algorithmically from each collection's visual content.
 
+## Links
+
+- Jupyter notebook with the full 240-image run (opens in Google Colab):
+  https://colab.research.google.com/github/jamelski1/seng691-hw5/blob/main/seng691-hw5.ipynb
+- A generated slideshow video (Google Drive):
+  https://drive.google.com/file/d/1i85gaqTzuXiqpCSvA3wFZmRBnSUAeHzE/view
+- Live web service (the same pipeline as a web app):
+  https://photo-albums-y7ir.onrender.com
+- Web service source: https://github.com/jamelski1/photo-albums-app
+
 ## Pipeline
 
 1. **Collect** (`src/collect_dataset.py`) — downloads 240 freely
