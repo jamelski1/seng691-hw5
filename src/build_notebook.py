@@ -28,7 +28,8 @@ This notebook builds a complete automatic photo album system:
 4. Background music synthesized in code and selected per cluster by a fixed algorithmic rule over the cluster's visual statistics.
 5. Slideshow videos rendered with FFmpeg.
 
-Requirements are in `README.md`. Heavy steps cache their results under `output/`, so re-running the notebook reuses the cached features and statistics when they exist.""")
+Requirements are in `README.md`. Heavy steps cache their results under `output/`, so re-running the notebook reuses the cached features and statistics when they exist.
+**Scope note:** This notebook contains the full 240-image run that satisfies the assignment. The hosted web service is an add-on deployment of the same pipeline for interactive use with smaller uploads (8 to 240 photos); it is not a substitute for this notebook run.""")
 
 code("""import csv, json
 from collections import Counter
@@ -199,7 +200,23 @@ display(ShowImage(str(OUT / "montage_cluster_3.jpg"), width=720))""")
 
 md("""## 4. Music, synthesized and selected by rule
 
-Four original tracks are synthesized with NumPy (no copyrighted audio). Each has a profile: tempo, mode, register, timbre, warmth. The selection rule normalizes each cluster's visual statistics across the clusters, builds a target profile (edge density drives tempo, brightness drives register, brightness with saturation drives mode, saturation drives timbre, color balance drives warmth), and picks the track with the smallest weighted distance to the target. Fixed, deterministic, and saved with its scores.""")
+Four original tracks are synthesized with NumPy (no copyrighted audio). Each has a profile: tempo, mode, register, timbre, warmth. The selection rule normalizes each cluster's visual statistics across the clusters, builds a target profile (edge density drives tempo, brightness drives register, brightness with saturation drives mode, saturation drives timbre, color balance drives warmth), and picks the track with the smallest weighted distance to the target. Fixed, deterministic, and saved with its scores.
+
+An optional second source, real Creative Commons tracks from Jamendo, can replace the synthesized track per cluster when a personal API key is supplied; see the next cells. It uses the same target profile and the same fallback logic as the hosted web service.""")
+
+md("""### Optional: real tracks from Jamendo (bring your own key)
+
+The same pipeline also runs as a hosted web service, where each cluster's target profile can be matched to a real Creative Commons track from Jamendo instead of a synthesized one. That is optional here and is not part of the submitted results. Paste your own Jamendo client ID in the configuration cell below, and the Jamendo cell after the selection rule will, for each cluster, query Jamendo with the same target-to-query mapping and deterministic candidate scoring the web service uses, download the winning track, and use it for that cluster's slideshow. With no key, or if any step fails for a cluster, that cluster keeps the synthesized track the rule chose, exactly as the web service falls back. Either way, the notebook prints, per cluster, which source was used and, for Jamendo picks, the track title and artist.""")
+
+code("""# --- CONFIGURATION: your own Jamendo client ID (optional) ---
+# A free client ID comes from https://devportal.jamendo.com/ (sign up,
+# create an app, copy its Client ID). Leave this empty to use only the
+# synthesized tracks, which is how the submitted run was produced.
+JAMENDO_CLIENT_ID = ""
+
+# Alternative that keeps the key out of the saved notebook:
+# import getpass
+# JAMENDO_CLIENT_ID = getpass.getpass("Jamendo client ID (blank = synthesized only): ")""")
 
 code("""from scipy.io import wavfile
 
@@ -298,13 +315,165 @@ for info in clusters:
     choices[info["cluster"]] = best
     print(f"Cluster {info['cluster']} ({info['dominant']}): -> {best}  {scores}")""")
 
+code("""# --- Jamendo: real Creative Commons tracks, same rule, with fallback ---
+# Ported from the web service's jamendo module so this notebook stays
+# self-contained. The cluster target built by the selection rule above
+# (keys tempo_norm, major, timbre, register_norm, warmth) is mapped to
+# a fuzzy-tag query, candidates are scored deterministically, and the
+# winner is downloaded. Any failure returns None and that cluster
+# falls back to its synthesized track.
+import json as _jam_json
+import urllib.parse as _jam_parse
+import urllib.request as _jam_request
+
+JAMENDO_API_URL = "https://api.jamendo.com/v3.0/tracks/"
+_JAM_BRIGHT = ("happy", "uplifting", "energetic", "fun")
+_JAM_DARK = ("melancholic", "dramatic", "emotional", "sad")
+_JAM_WARM = ("warm", "acoustic", "folk")
+_JAM_COOL = ("electronic", "ambient", "chill")
+_JAM_SPEED_ORDER = {"low": 0, "medium": 1, "high": 2}
+
+
+def _jam_speed_bucket(tempo_norm):
+    if tempo_norm >= 0.62:
+        return "high"
+    if tempo_norm >= 0.35:
+        return "medium"
+    return "low"
+
+
+def jamendo_target_to_query(target):
+    tags = list(_JAM_BRIGHT if target["major"] >= 0.5 else _JAM_DARK)
+    tags += _JAM_WARM if target["warmth"] >= 0.5 else _JAM_COOL
+    if target["tempo_norm"] >= 0.62:
+        tags.append("energetic")
+    elif target["tempo_norm"] < 0.35:
+        tags.append("relaxing")
+    return tags, _jam_speed_bucket(target["tempo_norm"])
+
+
+def _jam_get(url):
+    req = _jam_request.Request(url, headers={"User-Agent": "seng691-hw5-notebook/1.0"})
+    with _jam_request.urlopen(req, timeout=20) as resp:
+        return _jam_json.loads(resp.read().decode("utf-8"))
+
+
+def jamendo_search_tracks(tags, cid, limit=50):
+    # The API's speed filter is not used: Jamendo speed metadata is so
+    # sparse that filtering by it returns almost nothing. Speed is
+    # scored locally instead, when a candidate carries it.
+    params = {"client_id": cid, "format": "json", "limit": limit,
+              "fuzzytags": " ".join(tags), "include": "musicinfo+licenses",
+              "order": "popularity_total", "vocalinstrumental": "instrumental"}
+    data = _jam_get(JAMENDO_API_URL + "?" + _jam_parse.urlencode(params))
+    if data.get("headers", {}).get("status") != "success":
+        return []
+    return data.get("results", [])
+
+
+def jamendo_score_candidate(track, want_tags, want_speed):
+    # Lower is better. Deterministic in the track's own fields.
+    info = track.get("musicinfo", {}) or {}
+    speed_dist = abs(_JAM_SPEED_ORDER.get(info.get("speed") or "", 1)
+                     - _JAM_SPEED_ORDER[want_speed])
+    track_tags = set()
+    for key in ("genres", "vartags", "instruments"):
+        track_tags.update(t.lower() for t in (info.get("tags", {}) or {}).get(key, []) or [])
+    overlap = len(track_tags.intersection(t.lower() for t in want_tags))
+    downloadable = 0 if track.get("audiodownload_allowed") else 1
+    return (speed_dist, -overlap, downloadable, int(track.get("id", 0)))
+
+
+def jamendo_pick_for_target(target, cid):
+    # Best Jamendo track for one cluster target, or None to fall back.
+    if not cid:
+        return None
+    tags, speed = jamendo_target_to_query(target)
+    try:
+        results = jamendo_search_tracks(tags, cid)
+        if not results:
+            results = jamendo_search_tracks(tags[:2], cid)
+        if not results:
+            results = jamendo_search_tracks(tags[:1], cid)
+    except Exception:
+        return None
+    if not results:
+        return None
+    best = min(results, key=lambda t: jamendo_score_candidate(t, tags, speed))
+    audio_url = best.get("audiodownload") if best.get("audiodownload_allowed") else best.get("audio")
+    if not audio_url:
+        return None
+    return {"source": "jamendo", "track_id": int(best.get("id", 0)),
+            "title": best.get("name", "Untitled"),
+            "artist": best.get("artist_name", "Unknown artist"),
+            "audio_url": audio_url,
+            "page_url": f"https://www.jamendo.com/track/{best.get('id')}",
+            "license_ccurl": (best.get("licenses", {}) or {}).get("ccurl")
+                             or best.get("license_ccurl", ""),
+            "duration": best.get("duration"),
+            "query_tags": tags, "query_speed": speed,
+            "score": jamendo_score_candidate(best, tags, speed)[:3]}
+
+
+def jamendo_download(audio_url, dest):
+    # Download the track file; True only if it looks like real audio.
+    try:
+        req = _jam_request.Request(audio_url,
+                                   headers={"User-Agent": "seng691-hw5-notebook/1.0"})
+        with _jam_request.urlopen(req, timeout=60) as resp, open(dest, "wb") as f:
+            f.write(resp.read())
+        return dest.stat().st_size > 10_000
+    except Exception:
+        return False
+
+
+def cluster_target(cluster, all_clusters):
+    # The same target profile choose_track builds, returned on its own
+    # so the Jamendo query and the synthesized choice read identical
+    # numbers.
+    def norm(v, key):
+        vals = [c[key] for c in all_clusters]
+        lo, hi = min(vals), max(vals)
+        return 0.5 if hi <= lo else float(np.clip((v - lo) / (hi - lo), 0, 1))
+    bright = norm(cluster["mean_brightness"], "mean_brightness")
+    sat = norm(cluster["mean_saturation"], "mean_saturation")
+    return {"tempo_norm": norm(cluster["mean_edge_density"], "mean_edge_density"),
+            "major": 0.25 + 0.75 * (bright + sat) / 2.0,
+            "timbre": sat, "register_norm": bright,
+            "warmth": norm(cluster["mean_warmth"], "mean_warmth")}
+
+
+# Resolve every cluster to an audio file: Jamendo when a key is set and
+# the query and download succeed, the synthesized track otherwise.
+_key = (JAMENDO_CLIENT_ID or "").strip()
+music_files = {}
+music_picks = {}
+for info in clusters:
+    c = info["cluster"]
+    pick = jamendo_pick_for_target(cluster_target(info, clusters), _key) if _key else None
+    dest = OUT / "music" / f"jamendo_cluster_{c}.mp3"
+    if pick and jamendo_download(pick["audio_url"], dest):
+        music_files[c] = dest
+        music_picks[c] = pick
+        print(f"Cluster {c} ({info['dominant']}): Jamendo - '{pick['title']}' "
+              f"by {pick['artist']}  {pick['page_url']}")
+    else:
+        music_files[c] = OUT / "music" / f"{choices[c]}.wav"
+        music_picks[c] = {"source": "synthesized", "track": choices[c]}
+        reason = "no Jamendo client ID set" if not _key else "Jamendo lookup failed, falling back"
+        print(f"Cluster {c} ({info['dominant']}): synthesized - '{choices[c]}' ({reason})")
+
+with open(OUT / "music_choices.json", "w") as f:
+    _jam_json.dump(music_picks, f, indent=2, default=str)
+print("saved", OUT / "music_choices.json")""")
+
 code("""from IPython.display import Audio, display
-print("The track the rule chose for Cluster 3 (greenery):", choices[3])
-display(Audio(str(OUT / "music" / f"{choices[3]}.wav")))""")
+print("Music for Cluster 3 (greenery):", music_picks[3])
+display(Audio(str(music_files[3])))""")
 
 md("""## 5. Slideshow video
 
-The builder takes a cluster's most central images, renders each at 1280 by 720 over a blurred fill of itself (nothing cropped, no black bars), fades between them, and lays the chosen track underneath. Below, Cluster 3 is built and shown; `src/build_videos.py` builds the three largest clusters the same way.""")
+The builder takes a cluster's most central images, renders each at 1280 by 720 over a blurred fill of itself (nothing cropped, no black bars), fades between them, and lays the chosen track underneath. Below, Cluster 3 is built and shown; `src/build_videos.py` builds the three largest clusters the same way. The audio laid underneath is `music_files[CID]`: the downloaded Jamendo MP3 when one was picked for that cluster, otherwise the synthesized WAV the rule chose.""")
 
 code("""import subprocess, tempfile
 
@@ -335,10 +504,10 @@ with tempfile.TemporaryDirectory() as td:
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i",
          str(td / "list.txt"), "-c", "copy", str(td / "joined.mp4")])
     run(["ffmpeg", "-y", "-i", str(td / "joined.mp4"), "-i",
-         str(OUT / "music" / f"{track}.wav"), "-c:v", "copy", "-c:a", "aac",
+         str(music_files[CID]), "-c:v", "copy", "-c:a", "aac",
          "-b:a", "160k", "-af", "afade=t=out:st=39.6:d=2", "-shortest",
          str(OUT / f"slideshow_cluster_{CID}.mp4")])
-print("built slideshow_cluster_3.mp4 with music:", track)""")
+print("built slideshow_cluster_3.mp4 with music:", music_picks[CID])""")
 
 code("""from IPython.display import Video, display
 display(Video(str(OUT / "slideshow_cluster_3.mp4"), width=720,
